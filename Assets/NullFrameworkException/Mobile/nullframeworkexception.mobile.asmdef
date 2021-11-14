@@ -1,0 +1,16 @@
+{
+    "name": "nullframeworkexception.mobile",
+    "rootNamespace": "",
+    "references": [
+        "GUID:2c75e160a04bbce448e194e698a96fc0"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

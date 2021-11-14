@@ -1,0 +1,18 @@
+{
+    "name": "nullframeworkexception.core.editor",
+    "rootNamespace": "",
+    "references": [
+        "GUID:2c75e160a04bbce448e194e698a96fc0"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
