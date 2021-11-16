@@ -10,20 +10,20 @@ namespace NullFrameworkException.CharacterMovement.Rigidbody3d
         [SerializeField] private Transform orientation;
 
         [Header("Detection")]
-        [SerializeField] private float wallDistance = .5f;
+        [SerializeField] private float wallDistance = 0.6f;
         [SerializeField] private float minimumJumpHeight = 1.5f;
 
         [Header("Wall Running")]
-        [SerializeField] private float wallRunGravity;
-        [SerializeField] private float wallRunJumpForce;
+        [SerializeField] private float wallRunGravity = 1f;
+        [SerializeField] private float wallRunJumpForce = 6f;
 
         [Header("Camera")]
-        [SerializeField] private Camera cam;
-        [SerializeField] private float fov;
-        [SerializeField] private float wallRunfov;
-        [SerializeField] private float wallRunfovTime;
-        [SerializeField] private float camTilt;
-        [SerializeField] private float camTiltTime;
+        [SerializeField] private Camera cammera;
+        [SerializeField] private float fov = 90f;
+        [SerializeField] private float wallRunfov = 100f;
+        [SerializeField] private float wallRunfovTime = 10f;
+        [SerializeField] private float camTilt = 10f;
+        [SerializeField] private float camTiltTime = 10f;
 
         public float tilt { get; private set; }
 
@@ -60,12 +60,10 @@ namespace NullFrameworkException.CharacterMovement.Rigidbody3d
                 if (wallLeft)
                 {
                     StartWallRun();
-                    Debug.Log("wall running on the left");
                 }
                 else if (wallRight)
                 {
                     StartWallRun();
-                    Debug.Log("wall running on the right");
                 }
                 else
                 {
@@ -84,7 +82,7 @@ namespace NullFrameworkException.CharacterMovement.Rigidbody3d
 
             rb.AddForce(Vector3.down * wallRunGravity, ForceMode.Force);
 
-            cam.fieldOfView = Mathf.Lerp(cam.fieldOfView, wallRunfov, wallRunfovTime * Time.deltaTime);
+            cammera.fieldOfView = Mathf.Lerp(cammera.fieldOfView, wallRunfov, wallRunfovTime * Time.deltaTime);
 
             if (wallLeft)
                 tilt = Mathf.Lerp(tilt, -camTilt, camTiltTime * Time.deltaTime);
@@ -113,7 +111,7 @@ namespace NullFrameworkException.CharacterMovement.Rigidbody3d
         {
             rb.useGravity = true;
 
-            cam.fieldOfView = Mathf.Lerp(cam.fieldOfView, fov, wallRunfovTime * Time.deltaTime);
+            cammera.fieldOfView = Mathf.Lerp(cammera.fieldOfView, fov, wallRunfovTime * Time.deltaTime);
             tilt = Mathf.Lerp(tilt, 0, camTiltTime * Time.deltaTime);
         }
     }

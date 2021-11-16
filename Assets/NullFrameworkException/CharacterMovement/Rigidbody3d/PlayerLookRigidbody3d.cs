@@ -10,11 +10,11 @@ namespace NullFrameworkException.CharacterMovement.Rigidbody3d
         [Header("References")] [SerializeField] WallRunRigidbody3d wallRun;
 
         /// <summary> Horizontal sensitivity. </summary>
-        [SerializeField] private float sensX = 100f;
+        [SerializeField] private float sensX = 150f;
         /// <summary> Vertical sensitivity. </summary>
-        [SerializeField] private float sensY = 100f;
+        [SerializeField] private float sensY = 150f;
 
-        [SerializeField] private Transform cam = null;
+        [SerializeField] private Transform cammeraHolder = null;
         [SerializeField] private Transform orientation = null;
 
         float mouseX;
@@ -41,7 +41,7 @@ namespace NullFrameworkException.CharacterMovement.Rigidbody3d
 
             xRotation = Mathf.Clamp(xRotation, -90f, 90f);
 
-            cam.transform.rotation = Quaternion.Euler(xRotation, yRotation, wallRun.tilt);
+            cammeraHolder.transform.rotation = Quaternion.Euler(xRotation, yRotation, wallRun.tilt);
             orientation.transform.rotation = Quaternion.Euler(0, yRotation, 0);
         }
 
