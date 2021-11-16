@@ -33,7 +33,7 @@ namespace NullFrameworkException.Teleport
             // Quicksort these points by distance (floats).
         }
 
-        // Update is called once per frame
+        // Update is called once per frame, but you probably already knew that.
         void Update()
         {
             if(Input.GetKeyDown(teleportClosestKey))

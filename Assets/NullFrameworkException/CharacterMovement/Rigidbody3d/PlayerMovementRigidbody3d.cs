@@ -30,6 +30,11 @@ namespace NullFrameworkException.CharacterMovement.Rigidbody3d
 
 		/// <summary> The jump force suddenly applied on the player when they jump. </summary>
 		[Header("Jumping")] public float jumpForce = 14f;
+		[SerializeField] private float fallMultiplier = 8;
+		[SerializeField] private float lowJumpMultiplier = 2f;
+		[SerializeField] private bool leftground = false;
+		[SerializeField] private float rememberGroundedFor;
+		[SerializeField] private int defaultAdditionalJumps = 1;
 
 		/// <summary> The keycode to jump. Can be changed in inspector. </summary>
 		[Header("Keybinds")] [SerializeField] KeyCode jumpKey = KeyCode.Space;
@@ -49,7 +54,7 @@ namespace NullFrameworkException.CharacterMovement.Rigidbody3d
 		private LayerMask groundMask;
 		/// <summary> How close player is to the ground to reset jump.</summary>
 		[SerializeField, Tooltip("How close player is to the ground to reset jump.")]
-		private float groundDistance = 0.1f;
+		private float groundDistance = 0.3f;
 
 		// HIDDEN VARIABLES.
 		/// <summary> Method for if player is "Grounded" or not. </summary>
@@ -63,12 +68,19 @@ namespace NullFrameworkException.CharacterMovement.Rigidbody3d
 		/// <summary> The current horizontal movement of the player. </summary>
 		private float verticalMovement;
 		/// <summary> The Rigidbody attached to the player. </summary>
-		private Rigidbody rb;
+		private Rigidbody myRigidbody;
 		/// <summary> The internal movement mutiplier of the player so they move at a mormal speed. </summary>
 		private float movementMultiplier = 10f;
 		/// <summary> The raycast if we are on a slope. </summary>
 		private RaycastHit slopeHit;
+		/// <summary> If the player is jumping. </summary>
+		private bool jumpingNow = false;
+		/// <summary> Current time since the player was grounded (for if the player recently fell off). </summary>
+		private float lastTimeGrounded;
+		/// <summary> How many additional jumps does the player have </summary>
+		private int additionalJumps;
 
+		
 		/// <summary> Check if we are on a slope. </summary>
 		/// <returns> Returns true if on a slope. </returns>
 		private bool OnSlope()
@@ -84,10 +96,10 @@ namespace NullFrameworkException.CharacterMovement.Rigidbody3d
 		private void Start()
 		{
 			// Get the Rigidbody on the player.
-			rb = GetComponent<Rigidbody>();
+			myRigidbody = GetComponent<Rigidbody>();
 			// Make sure interpolation = True.
-			rb.interpolation = RigidbodyInterpolation.Interpolate;
-			rb.freezeRotation = true;
+			myRigidbody.interpolation = RigidbodyInterpolation.Interpolate;
+			myRigidbody.freezeRotation = true;
 		}
 
 		private void Update()
@@ -103,7 +115,61 @@ namespace NullFrameworkException.CharacterMovement.Rigidbody3d
 				Jump();
 			}
 
+			BetterJump();
+			CheckIfGrounded();
+			
 			slopeMoveDirection = Vector3.ProjectOnPlane(moveDirection, slopeHit.normal);
+		}
+
+		private void CheckIfGrounded()
+		{
+			if(isGrounded && !jumpingNow)
+			{
+				additionalJumps = defaultAdditionalJumps;
+				leftground = false;
+			}
+			else
+			{
+				if(!leftground)
+				{
+					lastTimeGrounded = Time.time;
+				}
+				leftground = true;
+				isGrounded = false;
+			}
+		}
+
+		/// <summary> Press jump to jump. </summary>
+		private void Jump()
+		{
+			// if(isGrounded)
+			// {
+			// 	myRigidbody.velocity = new Vector3(myRigidbody.velocity.x, 0, myRigidbody.velocity.z);
+			// 	myRigidbody.AddForce(transform.up * jumpForce, ForceMode.Impulse);
+			// }
+			
+			if((isGrounded || Time.time - lastTimeGrounded <= rememberGroundedFor) && additionalJumps >= 0)
+			{
+				myRigidbody.velocity = new Vector2(myRigidbody.velocity.x, jumpForce);
+				additionalJumps--;
+				jumpingNow = true;
+			}
+		}
+		
+		/// <summary> This makes the Jumping feel better </summary>
+		private void BetterJump()
+		{
+			if(myRigidbody.velocity.y < 0)
+			{
+				Vector2 HoriVerti = Vector2.up * Physics2D.gravity * (fallMultiplier - 1) * Time.deltaTime;
+				myRigidbody.velocity += new Vector3(HoriVerti.x, HoriVerti.y, 0);
+				jumpingNow = false;
+			}
+			else if(myRigidbody.velocity.y > 0 && !Input.GetButtonDown("Jump"))
+			{
+				Vector2 HoriVerti2 = Vector2.up * Physics2D.gravity * (lowJumpMultiplier - 1) * Time.deltaTime;
+				myRigidbody.velocity += new Vector3(HoriVerti2.x, HoriVerti2.y, 0);
+			}
 		}
 
 		/// <summary> This handles the input of all the WASD movement, Foward, Back, Left and Right. </summary>
@@ -117,15 +183,6 @@ namespace NullFrameworkException.CharacterMovement.Rigidbody3d
 			moveDirection = orientation.forward * verticalMovement + orientation.right * horizontalMovement;
 		}
 
-		/// <summary> Press jump to jump. </summary>
-		private void Jump()
-		{
-			if(isGrounded)
-			{
-				rb.velocity = new Vector3(rb.velocity.x, 0, rb.velocity.z);
-				rb.AddForce(transform.up * jumpForce, ForceMode.Impulse);
-			}
-		}
 
 		/// <summary> Control the changing acceleration of the player. </summary>
 		private void ControlSpeed()
@@ -141,7 +198,7 @@ namespace NullFrameworkException.CharacterMovement.Rigidbody3d
 		}
 
 		/// <summary> If the player is in the air they have less drag, this improves jump feel. </summary>
-		private void ControlDrag() => rb.drag = isGrounded ? groundDrag : airDrag;
+		private void ControlDrag() => myRigidbody.drag = isGrounded ? groundDrag : airDrag;
 
 		/// <summary> FixedUpdate has the frequency of the movement system.
 		/// Since movement is physics based we will need to use this. </summary>
@@ -157,15 +214,15 @@ namespace NullFrameworkException.CharacterMovement.Rigidbody3d
 
 			if(isGrounded && !OnSlope())
 			{
-				rb.AddForce(moveDirection.normalized * moveSpeed * movementMultiplier, ForceMode.Acceleration);
+				myRigidbody.AddForce(moveDirection.normalized * moveSpeed * movementMultiplier, ForceMode.Acceleration);
 			}
 			else if(isGrounded && OnSlope())
 			{
-				rb.AddForce(slopeMoveDirection.normalized * moveSpeed * movementMultiplier, ForceMode.Acceleration);
+				myRigidbody.AddForce(slopeMoveDirection.normalized * moveSpeed * movementMultiplier, ForceMode.Acceleration);
 			}
 			else if(!isGrounded)
 			{
-				rb.AddForce(moveDirection.normalized * moveSpeed * movementMultiplier * airMultiplier, ForceMode.Acceleration);
+				myRigidbody.AddForce(moveDirection.normalized * moveSpeed * movementMultiplier * airMultiplier, ForceMode.Acceleration);
 			}
 		}
 	}
