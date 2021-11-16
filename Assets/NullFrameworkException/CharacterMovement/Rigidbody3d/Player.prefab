@@ -197,9 +197,13 @@ MonoBehaviour:
   moveSpeed: 6
   airMultiplier: 0.4
   walkSpeed: 4
-  sprintSpeed: 6
+  sprintSpeed: 9
   acceleration: 10
-  jumpForce: 14
+  jumpForce: 17
+  fallMultiplier: 2
+  lowJumpMultiplier: 2
+  leftground: 0
+  rememberGroundedFor: 0.4
   jumpKey: 32
   sprintKey: 304
   groundDrag: 6
@@ -207,7 +211,7 @@ MonoBehaviour:
   groundCheck: {fileID: 8433225099900579391}
   groundMask:
     serializedVersion: 2
-    m_Bits: 64
+    m_Bits: 0
   groundDistance: 0.3
 --- !u!114 &8433225100089837282
 MonoBehaviour:

@@ -24,17 +24,16 @@ namespace NullFrameworkException.CharacterMovement.Rigidbody3d
 		/// <summary> Normal walking speed the player moves at. </summary>
 		[Header("Sprinting")] [SerializeField] private float walkSpeed = 4f;
 		/// <summary> The player sprinting speed. </summary>
-		[SerializeField] float sprintSpeed = 6f;
+		[SerializeField] float sprintSpeed = 9f;
 		/// <summary> How fast the player comes to either of these speeds. </summary>
 		[SerializeField] float acceleration = 10f;
 
 		/// <summary> The jump force suddenly applied on the player when they jump. </summary>
-		[Header("Jumping")] public float jumpForce = 14f;
-		[SerializeField] private float fallMultiplier = 8;
+		[Header("Jumping")] public float jumpForce = 17f;
+		[SerializeField] private float fallMultiplier = 2;
 		[SerializeField] private float lowJumpMultiplier = 2f;
 		[SerializeField] private bool leftground = false;
-		[SerializeField] private float rememberGroundedFor;
-		[SerializeField] private int defaultAdditionalJumps = 1;
+		[SerializeField] private float rememberGroundedFor = 0.4f;
 
 		/// <summary> The keycode to jump. Can be changed in inspector. </summary>
 		[Header("Keybinds")] [SerializeField] KeyCode jumpKey = KeyCode.Space;
@@ -77,8 +76,6 @@ namespace NullFrameworkException.CharacterMovement.Rigidbody3d
 		private bool jumpingNow = false;
 		/// <summary> Current time since the player was grounded (for if the player recently fell off). </summary>
 		private float lastTimeGrounded;
-		/// <summary> How many additional jumps does the player have </summary>
-		private int additionalJumps;
 
 		
 		/// <summary> Check if we are on a slope. </summary>
@@ -125,7 +122,6 @@ namespace NullFrameworkException.CharacterMovement.Rigidbody3d
 		{
 			if(isGrounded && !jumpingNow)
 			{
-				additionalJumps = defaultAdditionalJumps;
 				leftground = false;
 			}
 			else
@@ -148,10 +144,10 @@ namespace NullFrameworkException.CharacterMovement.Rigidbody3d
 			// 	myRigidbody.AddForce(transform.up * jumpForce, ForceMode.Impulse);
 			// }
 			
-			if((isGrounded || Time.time - lastTimeGrounded <= rememberGroundedFor) && additionalJumps >= 0)
+			if((isGrounded || Time.time - lastTimeGrounded <= rememberGroundedFor))
 			{
-				myRigidbody.velocity = new Vector2(myRigidbody.velocity.x, jumpForce);
-				additionalJumps--;
+				myRigidbody.velocity = new Vector3(myRigidbody.velocity.x, 0,myRigidbody.velocity.z);
+				myRigidbody.AddForce(transform.up*jumpForce, ForceMode.Impulse);
 				jumpingNow = true;
 			}
 		}
@@ -212,15 +208,15 @@ namespace NullFrameworkException.CharacterMovement.Rigidbody3d
 		{
 			// To note: you dont need to make "rb.AddForce" framerate independent.
 
-			if(isGrounded && !OnSlope())
+			if((isGrounded || Time.time - lastTimeGrounded <= rememberGroundedFor) && !OnSlope())
 			{
 				myRigidbody.AddForce(moveDirection.normalized * moveSpeed * movementMultiplier, ForceMode.Acceleration);
 			}
-			else if(isGrounded && OnSlope())
+			else if((isGrounded || Time.time - lastTimeGrounded <= rememberGroundedFor) && OnSlope())
 			{
 				myRigidbody.AddForce(slopeMoveDirection.normalized * moveSpeed * movementMultiplier, ForceMode.Acceleration);
 			}
-			else if(!isGrounded)
+			else if(!(isGrounded || Time.time - lastTimeGrounded <= rememberGroundedFor))
 			{
 				myRigidbody.AddForce(moveDirection.normalized * moveSpeed * movementMultiplier * airMultiplier, ForceMode.Acceleration);
 			}
