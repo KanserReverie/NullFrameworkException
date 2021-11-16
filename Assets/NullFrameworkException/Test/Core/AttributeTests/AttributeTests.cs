@@ -1,10 +1,10 @@
 using System;
+using System.Diagnostics.CodeAnalysis;
 using UnityEngine;
-// ReSharper disable NotAccessedField.Local
 
 namespace NullFrameworkException.Test.Core.AttributeTests
 {
-    public class AttributeTests : MonoBehaviour
+    [SuppressMessage("ReSharper", "NotAccessedField.Local")] public class AttributeTests : MonoBehaviour
     {
         [TextArea(2,4)] [SerializeField] private string toolTip = 
             "See now it shows all Tags in the project so you wont miss typing in a string";

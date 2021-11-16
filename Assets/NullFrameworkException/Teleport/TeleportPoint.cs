@@ -4,12 +4,14 @@ using UnityEngine;
 
 namespace NullFrameworkException.Teleport
 {
+    /// <summary> The point the player can teleport to. </summary>
     public class TeleportPoint : MonoBehaviour
     {
-        // Lambda - Inline functions - Functions without actual definitions 
-        // like when we use private void - Just points to something // LAMBDAS ROCK
-        // In this case points to transform.position
+        /// <summary> This is the name of the point. </summary>
+        [SerializeField] private string pointName;
+        /// <summary> The position of the player. </summary>
         public Vector3 Position => transform.position;
+        /// <summary> The rotation of the player. </summary>
         public Quaternion Rotation => transform.rotation;
 
         // Simply a way to find any object marked as a waypoint

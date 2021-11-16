@@ -4,15 +4,18 @@ using UnityEngine;
 
 namespace NullFrameworkException.CharacterMovement.Rigidbody3d
 {
+    /// <summary> Attach to the player. </summary>
     public class PlayerLookRigidbody3d : MonoBehaviour
     {
         [Header("References")] [SerializeField] WallRunRigidbody3d wallRun;
 
+        /// <summary> Horizontal sensitivity. </summary>
         [SerializeField] private float sensX = 100f;
+        /// <summary> Vertical sensitivity. </summary>
         [SerializeField] private float sensY = 100f;
 
-        [SerializeField] Transform cam = null;
-        [SerializeField] Transform orientation = null;
+        [SerializeField] private Transform cam = null;
+        [SerializeField] private Transform orientation = null;
 
         float mouseX;
         float mouseY;
@@ -30,9 +33,9 @@ namespace NullFrameworkException.CharacterMovement.Rigidbody3d
 
         private void Update()
         {
-            mouseX = Input.GetAxisRaw("Mouse X");
-            mouseY = Input.GetAxisRaw("Mouse Y");
+            LookInput();
 
+            // If you rotate on your 
             yRotation += mouseX * sensX * multiplier;
             xRotation -= mouseY * sensY * multiplier;
 
@@ -40,6 +43,13 @@ namespace NullFrameworkException.CharacterMovement.Rigidbody3d
 
             cam.transform.rotation = Quaternion.Euler(xRotation, yRotation, wallRun.tilt);
             orientation.transform.rotation = Quaternion.Euler(0, yRotation, 0);
+        }
+
+        /// <summary> Mouse inputs of the player. </summary>
+        private void LookInput()
+        {
+            mouseX = Input.GetAxisRaw("Mouse X");
+            mouseY = Input.GetAxisRaw("Mouse Y");
         }
     }
 }

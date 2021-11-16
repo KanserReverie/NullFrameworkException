@@ -8,8 +8,16 @@ namespace NullFrameworkException.Teleport
     [RequireComponent(typeof(Rigidbody))]
     public class PlayerToTeleport : MonoBehaviour
     {
+        // PRIVATE VARIABLES
+        /// <summary> The rigidbody of the player. </summary>
         private Rigidbody myRigidbody;
+        /// <summary> An array of all the points to teleport on the map.
+        /// It would be cool if you could select the ones you wanted to tp to and which to disregard.
+        /// Maybe to also have a name for each point. </summary>
         private TeleportPoint[] teleportPoints;
+        
+        [Header("Keybind")] 
+        [SerializeField] KeyCode teleportClosestKey = KeyCode.Alpha1;
         
         // Start is called before the first frame update 
         void Start()
@@ -22,20 +30,19 @@ namespace NullFrameworkException.Teleport
         private void GetAndSortPoints()
         {
             teleportPoints = FindObjectsOfType<TeleportPoint>();
-            
-            // Quicksort these points. 
+            // Quicksort these points by distance (floats).
         }
 
         // Update is called once per frame
         void Update()
         {
-            if(Input.GetKeyDown(KeyCode.Alpha1))
+            if(Input.GetKeyDown(teleportClosestKey))
             {
                 TeleportToClosestPoint();
             }
         }
 
-        /// <summary> This will telepoint to either the closest point.  </summary>
+        /// <summary> This will telepoint to the closest point.  </summary>
         private void TeleportToClosestPoint()
         {
             // Gets all the points in scene and teleports to the nearest.

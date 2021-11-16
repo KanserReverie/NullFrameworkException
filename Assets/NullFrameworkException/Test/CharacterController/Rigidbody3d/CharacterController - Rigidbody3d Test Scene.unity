@@ -612,7 +612,7 @@ CapsuleCollider:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1250384119}
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 13400000, guid: 37d5d2aed28829148a0bd19692ea27f3, type: 2}
   m_IsTrigger: 0
   m_Enabled: 1
   m_Radius: 0.5
@@ -695,7 +695,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 61d5e545f2ad79d44bf2fe62fe2a517c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  orientation: {fileID: 0}
+  orientation: {fileID: 1250384123}
   moveSpeed: 6
   airMultiplier: 0.4
   walkSpeed: 4
@@ -709,7 +709,7 @@ MonoBehaviour:
   groundCheck: {fileID: 0}
   groundMask:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 4294967295
   groundDistance: 0.2
 --- !u!54 &1250384125
 Rigidbody:
