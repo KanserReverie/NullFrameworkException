@@ -27,7 +27,7 @@ namespace NullFrameworkException.Teleport
         {
             myRigidbody = GetComponentInChildren<Rigidbody>();
             // Repeats the change every second so that you see the changes.
-            InvokeRepeating(nameof(GetAndSortPoints),0,1f);
+            InvokeRepeating(nameof(GetAndSortPoints),0,0.1f);
         }
 
         /// <summary> This will get and sort all the TeleportPoints in the scene. </summary>
@@ -125,24 +125,30 @@ namespace NullFrameworkException.Teleport
             {
                 // Gets all the points in scene and teleports to the nearest.
                 GetAndSortPoints();
-                
+
+                // Gets the closest point using a linear search.
+                // This should all be in order so should not matter anyway
                 TeleportPoint closestPoint = LinearSearchToPoint();
 
-                // Move the gameobject with the Rigidbody on it.
-                if(referenceTeleportPoints.Length > 0)
-                {
-                    this.transform.position = closestPoint.Position;
-                    this.transform.rotation = closestPoint.Rotation;
-                }
-
-                // Reset the Rigidbody.
-                myRigidbody.velocity = Vector3.zero;
-                myRigidbody.angularVelocity = Vector3.zero;
+                TeleportToPoint(closestPoint);
             }
             else
             {
                 Debug.LogWarning("No where to teleport");
             }
+        }
+
+        /// <summary> Teleport this player to the input point. </summary>
+        /// <param name="_pointToTeleportTo"> The TeleportPoint for the player to teleport to. </param>
+        public void TeleportToPoint(TeleportPoint _pointToTeleportTo)
+        {
+            // Move the gameobject with the Rigidbody on it.
+            this.transform.position = _pointToTeleportTo.Position;
+            this.transform.rotation = _pointToTeleportTo.Rotation;
+            
+            // Reset the Rigidbody.
+            myRigidbody.velocity = Vector3.zero;
+            myRigidbody.angularVelocity = Vector3.zero;
         }
 
         /// <summary> A simple Linear Search. </summary>
