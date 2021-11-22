@@ -14,50 +14,148 @@ namespace NullFrameworkException.Teleport
         /// <summary> An array of all the points to teleport on the map.
         /// It would be cool if you could select the ones you wanted to tp to and which to disregard.
         /// Maybe to also have a name for each point. </summary>
-        private TeleportPoint[] teleportPoints;
+        public ReferenceTeleportPoint[] referenceTeleportPoints;
         
-        [Header("Keybind")] 
-        [SerializeField] KeyCode teleportClosestKey = KeyCode.Alpha1;
+        /// <summary> Yes or No if the player is to teleport on Keypress </summary>
+        public bool teleportOnKeypress;
+        
+        [Header("Keybind")]
+        public KeyCode teleportClosestKey = KeyCode.Alpha1;
         
         // Start is called before the first frame update 
         void Start()
         {
             myRigidbody = GetComponentInChildren<Rigidbody>();
-            GetAndSortPoints();
+            // Repeats the change every second so that you see the changes.
+            InvokeRepeating(nameof(GetAndSortPoints),0,1f);
         }
 
         /// <summary> This will get and sort all the TeleportPoints in the scene. </summary>
         private void GetAndSortPoints()
         {
-            teleportPoints = FindObjectsOfType<TeleportPoint>();
+            // Gets all the points in Scene.
+            TeleportPoint[] teleportPoints = FindObjectsOfType<TeleportPoint>();
+            // Resets the list of T
+            referenceTeleportPoints = new ReferenceTeleportPoint[teleportPoints.Length];
+            
             // Quicksort these points by distance (floats).
+            for(int i = 0; i < teleportPoints.Length; i++)
+            {
+                // Saves the reference point.
+                referenceTeleportPoints[i].thisTeleportPoint = teleportPoints[i];
+                // Update point name.
+                referenceTeleportPoints[i].pointName = teleportPoints[i].PointName;
+                // Shows distance from Player.
+                referenceTeleportPoints[i].distanceAwayFromPlayer = Vector3.Distance(teleportPoints[i].Position, transform.position);
+            }
+
+            if (referenceTeleportPoints.Length > 0)
+                SortPoints(referenceTeleportPoints);
+            else
+                Debug.Log("No Points to Sort");
+        }
+
+        /// <summary> This will sort the reference points. </summary>
+        /// <param name="_referenceTeleportPoints"> Reference to the Point Array to be sorted. </param>
+        private void SortPoints(ReferenceTeleportPoint[] _referenceTeleportPoints)
+        {
+            QuicksortPoints(_referenceTeleportPoints, 0, _referenceTeleportPoints.Length - 1);
+        }
+
+        /// <summary> A Quicksort of the implemented points. </summary>
+        /// <param name="_referenceTeleportPoints"> Array to sort. </param>
+        /// <param name="_left"> Left most element index. </param>
+        /// <param name="_right"> Right most element index. </param>
+        private void QuicksortPoints(ReferenceTeleportPoint[] _referenceTeleportPoints, int _left, int _right)
+        {
+            int i = _left;
+            int j = _right;
+            
+            ReferenceTeleportPoint pivot = _referenceTeleportPoints[(_left + _right) / 2];
+
+            while(i <= j)
+            {
+                while(_referenceTeleportPoints[i].distanceAwayFromPlayer < pivot.distanceAwayFromPlayer)
+                    i++;
+                
+                while(_referenceTeleportPoints[j].distanceAwayFromPlayer > pivot.distanceAwayFromPlayer)
+                    i++;
+
+                if(i <= j)
+                {
+                    ReferenceTeleportPoint tmp = _referenceTeleportPoints[i];
+                    _referenceTeleportPoints[i] = _referenceTeleportPoints[j];
+                    _referenceTeleportPoints[j] = tmp;
+
+                    i++;
+                    j--;
+                }
+                
+                if (_left < j)
+                    QuicksortPoints(_referenceTeleportPoints, _left, j);
+                
+                if (i < _right)
+                    QuicksortPoints(_referenceTeleportPoints, i, _right);
+            }
         }
 
         // Update is called once per frame, but you probably already knew that.
         void Update()
         {
-            if(Input.GetKeyDown(teleportClosestKey))
+            if(Input.GetKeyDown(teleportClosestKey) && teleportOnKeypress)
             {
                 TeleportToClosestPoint();
             }
         }
 
         /// <summary> This will telepoint to the closest point.  </summary>
-        private void TeleportToClosestPoint()
+        public void TeleportToClosestPoint()
         {
-            // Gets all the points in scene and teleports to the nearest.
-            GetAndSortPoints();
-            
-            // Move the gameobject with the Rigidbody on it.
-            if(teleportPoints.Length > 0)
+            if(referenceTeleportPoints.Length > 0)
             {
-                this.transform.position = teleportPoints[0].Position;
-                this.transform.rotation = teleportPoints[0].Rotation;
-            }
+                // Gets all the points in scene and teleports to the nearest.
+                GetAndSortPoints();
+                
+                TeleportPoint closestPoint = LinearSearchToPoint();
 
-            // Reset the Rigidbody.
-            myRigidbody.velocity = Vector3.zero;
-            myRigidbody.angularVelocity = Vector3.zero;
+                // Move the gameobject with the Rigidbody on it.
+                if(referenceTeleportPoints.Length > 0)
+                {
+                    this.transform.position = closestPoint.Position;
+                    this.transform.rotation = closestPoint.Rotation;
+                }
+
+                // Reset the Rigidbody.
+                myRigidbody.velocity = Vector3.zero;
+                myRigidbody.angularVelocity = Vector3.zero;
+            }
+            else
+            {
+                Debug.LogWarning("No where to teleport");
+            }
         }
+
+        /// <summary> A simple Linear Search. </summary>
+        /// <returns> Returns the closest TeleportPoint. </returns>
+        private TeleportPoint LinearSearchToPoint()
+        {
+            ReferenceTeleportPoint closestPoint = referenceTeleportPoints[0]; 
+            for(int i = 0; i < referenceTeleportPoints.Length; i++)
+            {
+                if(referenceTeleportPoints[i].distanceAwayFromPlayer < closestPoint.distanceAwayFromPlayer)
+                    closestPoint = referenceTeleportPoints[i];
+            }
+            return closestPoint.thisTeleportPoint;
+        }
+    }
+    
+    [System.Serializable]
+    public class ReferenceTeleportPoint
+    {
+        [HideInInspector] public TeleportPoint thisTeleportPoint;
+        /// <summary> Name of the point. </summary>
+        [ReadOnly] public string pointName;
+        /// <summary> How far away is the player from this point. </summary>
+        [ReadOnly] public float distanceAwayFromPlayer;
     }
 }
