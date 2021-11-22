@@ -35,12 +35,17 @@ namespace NullFrameworkException.Teleport
         {
             // Gets all the points in Scene.
             TeleportPoint[] teleportPoints = FindObjectsOfType<TeleportPoint>();
-            // Resets the list of T
+            // Resets the list of point.
             referenceTeleportPoints = new ReferenceTeleportPoint[teleportPoints.Length];
             
-            // Quicksort these points by distance (floats).
+            // Save all these points a serializable class.
             for(int i = 0; i < teleportPoints.Length; i++)
             {
+                referenceTeleportPoints[i] = new ReferenceTeleportPoint
+                {
+                    thisTeleportPoint = null, pointName = null, distanceAwayFromPlayer = 0
+                };
+                
                 // Saves the reference point.
                 referenceTeleportPoints[i].thisTeleportPoint = teleportPoints[i];
                 // Update point name.
@@ -48,7 +53,8 @@ namespace NullFrameworkException.Teleport
                 // Shows distance from Player.
                 referenceTeleportPoints[i].distanceAwayFromPlayer = Vector3.Distance(teleportPoints[i].Position, transform.position);
             }
-
+            
+            // If there are any points quick sort them.
             if (referenceTeleportPoints.Length > 0)
                 SortPoints(referenceTeleportPoints);
             else
@@ -76,10 +82,14 @@ namespace NullFrameworkException.Teleport
             while(i <= j)
             {
                 while(_referenceTeleportPoints[i].distanceAwayFromPlayer < pivot.distanceAwayFromPlayer)
+                {
                     i++;
-                
+                }
+
                 while(_referenceTeleportPoints[j].distanceAwayFromPlayer > pivot.distanceAwayFromPlayer)
-                    i++;
+                {
+                    j--;
+                }
 
                 if(i <= j)
                 {
@@ -90,13 +100,13 @@ namespace NullFrameworkException.Teleport
                     i++;
                     j--;
                 }
-                
-                if (_left < j)
-                    QuicksortPoints(_referenceTeleportPoints, _left, j);
-                
-                if (i < _right)
-                    QuicksortPoints(_referenceTeleportPoints, i, _right);
             }
+            
+            if (_left < j)
+                QuicksortPoints(_referenceTeleportPoints, _left, j);
+                
+            if (i < _right)
+                QuicksortPoints(_referenceTeleportPoints, i, _right);
         }
 
         // Update is called once per frame, but you probably already knew that.

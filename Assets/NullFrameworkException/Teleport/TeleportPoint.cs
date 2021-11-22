@@ -15,8 +15,8 @@ namespace NullFrameworkException.Teleport
         public Vector3 Position => transform.position;
         /// <summary> The rotation of the player. </summary>
         public Quaternion Rotation => transform.rotation;
-
-
+        
+        
         // Implement this OnDrawGizmos if you want to draw gizmos that are also pickable and always drawn
         private void OnDrawGizmos()
         {
