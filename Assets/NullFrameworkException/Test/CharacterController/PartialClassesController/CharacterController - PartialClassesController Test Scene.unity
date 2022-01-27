@@ -156,6 +156,12 @@ MonoBehaviour:
   - toDoItem: Make it to rotate a game object that you complete for camera that auto
       creates when you check box
     isItCompleted: 0
+  - toDoItem: Basic Movement 2D - Left Right Jump
+    isItCompleted: 0
+  - toDoItem: Basic Movement 3D - WASD
+    isItCompleted: 0
+  - toDoItem: Turn on require component of type in real time, or not.
+    isItCompleted: 0
 --- !u!4 &856506196
 Transform:
   m_ObjectHideFlags: 0
